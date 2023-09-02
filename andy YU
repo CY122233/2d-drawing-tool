@@ -1,0 +1,50 @@
+using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
+
+public class DrawingTool : MonoBehaviour
+{
+    public Color drawColor = Color.black;
+    public float lineWidth = 5f;
+    public Button clearButton;
+    public Image canvasImage;
+
+    private List<Vector2> drawingPoints = new List<Vector2>();
+    private bool isDrawing = false;
+    private Texture2D canvasTexture;
+    private RectTransform canvasRect;
+    private Color[] canvasColors;
+
+    void Start()
+    {
+        canvasRect = canvasImage.rectTransform;
+        canvasTexture = new Texture2D((int)canvasRect.rect.width, (int)canvasRect.rect.height);
+        canvasImage.sprite = Sprite.Create(canvasTexture, new Rect(0, 0, canvasTexture.width, canvasTexture.height), Vector2.zero);
+        canvasColors = new Color[canvasTexture.width * canvasTexture.height];
+        clearButton.onClick.AddListener(ClearCanvas);
+    }
+
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0))
+        {
+            StartDrawing();
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            StopDrawing();
+        }
+
+        if (isDrawing)
+        {
+            Vector2 mousePosition = Input.mousePosition;
+            Vector2 canvasPos;
+            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, mousePosition, null, out canvasPos);
+
+            drawingPoints.Add(canvasPos);
+            DrawLine();
+        }
+    }
+
+    // 其他代码
+}
